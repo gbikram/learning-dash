@@ -17,17 +17,33 @@ dash_app.layout = [
         html.Header([
             html.Title(children='My App')
         ]),
-        html.H1(children="Test"),
-        html.Div([
-            # dbc.Input(type="email", id="example-email", placeholder="Enter email"),
-            # dbc.Input(type='password', placeholder='password'),
-            dbc.Textarea(id='freetext_input', placeholder='Input text', value="")
-        ]),
-        dbc.Button('Submit', id='submit_button', n_clicks=0),
-        html.Div([
-            # dbc.Textarea(id='parsed_output'),
-            dbc.Table(id='table-output')
-        ])
+        dbc.Row([
+            dbc.Col([html.H1(children="Test")])
+        ], align="center", className="pad-row"),
+        dbc.Row([
+            dbc.Col([
+                html.Div([
+                    dbc.Textarea(
+                        id='freetext_input', 
+                        placeholder='Input text', 
+                        value="",
+                        style={'height': '40vh'})
+                ]),
+            ])
+        ], align="center", className="pad-row"),
+        dbc.Row([
+            dbc.Col([
+                dbc.Button('Submit', id='submit_button', n_clicks=0)
+            ], 
+            width="auto")
+        ], align="center", className="pad-row"),
+        dbc.Row([
+            dbc.Col([
+                html.Div([
+                    dbc.Table(id='table-output')
+                ])
+            ])
+        ], align="center", className="pad-row")
     ])
 ]
 
@@ -38,14 +54,12 @@ dash_app.layout = [
 )
 def run_parser(n_clicks, value):
     if n_clicks > 0:
-        iocs_df = extract_iocs(value)
+        iocs_df = extract_iocs_as_df(value)
         table = dbc.Table.from_dataframe(iocs_df, striped=True, bordered=True, hover=True)
         return table
-    # if n_clicks > 0:
-    #     return f'You entered {value} and clicked {n_clicks} times'
 
 
-def extract_iocs(freetext):
+def extract_iocs_as_df(freetext):
     iocs = find_iocs(freetext)
     transform_schema = """
     {
@@ -62,7 +76,6 @@ def extract_iocs(freetext):
                 'ioc_value': ioc
             })    
     ioc_df = pd.DataFrame(iocs_transformed)
-    print(ioc_df)
     return ioc_df
 
 
